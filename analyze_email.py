@@ -75,16 +75,9 @@ conc = pd.concat([ham, spam], axis=1, keys=['ham','spam'])
 conc = pd.DataFrame(conc)
 
 #Apply Laplace correction
-#Incredibly slow, replace with something else
-for i in range(len(conc.ix[:,1])):
-	if math.isnan(conc.ix[i,1]):
-		conc.ix[i,1] = 1 
-	else:
-		conc.ix[i,1] += 1
-	if math.isnan(conc.ix[i,0]):
-		conc.ix[i,0] = 1 
-	else:
-		conc.ix[i,0] += 1
+conc.fillna(0, inplace=True)
+conc += 1
 		
+print conc
 conc.to_csv('out.csv', sep=',')
 print 'DONE'
