@@ -5,6 +5,7 @@ import email
 import glob
 from collections import defaultdict 
 import pandas as pd
+import numpy as np
 
 #Python dictionaries to hold word frequency
 spam_word_frequency = defaultdict( int )
@@ -54,10 +55,10 @@ root = os.path.dirname(os.path.realpath('__file__'))
 
 email_dir = 'public/'
 #Set path to test emails
-email_dir = filename = os.path.join(root, email_dir)
+email_dir = os.path.join(root, email_dir)
 
 #Go through all of the emails in the directory and extract their words
-for root, dirs, files in os.walk(email_dir):
+for main, dirs, files in os.walk(email_dir):
     for file in files:
     	filename = os.path.join(email_dir, file);
         if file.endswith(".txt"):
@@ -84,6 +85,6 @@ for i in range(len(conc.ix[:,1])):
 		conc.ix[i,0] = 1 
 	else:
 		conc.ix[i,0] += 1
-
-print conc
-
+		
+conc.to_csv('out.csv', sep=',')
+print 'DONE'
