@@ -6,8 +6,8 @@ import glob
 from collections import defaultdict 
 import pandas as pd
 import numpy as np 
-from nltk.corpus import stopwords
-from nltk.stem.wordnet import WordNetLemmatizer
+#from nltk.corpus import stopwords
+#from nltk.stem.wordnet import WordNetLemmatizer
 
 #Python dictionaries to hold word frequency
 spam_word_frequency = defaultdict( int )
@@ -79,7 +79,9 @@ conc = pd.DataFrame(conc)
 #Apply Laplace correction
 conc.fillna(0, inplace=True)
 conc += 1
-		
+
+conc = conc.transpose()
+
 print conc
 conc.to_csv('out.csv', sep=',')
 print 'DONE'
