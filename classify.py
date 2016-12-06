@@ -5,25 +5,10 @@ from sklearn.cross_validation import StratifiedKFold
 from sklearn.cross_validation import KFold
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import f1_score, confusion_matrix
+from sklearn.model_selection import cross_val_score
 
-# File containing data
-filename = 'out.csv'
 
-# Load data from csv file
-data = pd.DataFrame.from_csv(filename)
-
-# Init classifier
-clf = MultinomialNB()
-
-# Init count vectorizer
-count_vectorizer = CountVectorizer()
-
-# Randomize data indices
-data = data.reindex(np.random.permutation(data.index))
-
-#Classify using KFold
-def evaluate_with_kfold(data):
-	k_fold = KFold(n=len(data), n_folds=10)
+def evaluate_classifier_kf(data, kfold):
 	scores = []
 	confusion = np.array([[0, 0], [0, 0]])	
 	for train_indices, test_indices in k_fold:
@@ -46,7 +31,28 @@ def evaluate_with_kfold(data):
 	print('Score:', sum(scores)/len(scores))
 	print('Confusion matrix:')
 	print(confusion)
-	
 
-# Classify and test with KFold
-evaluate_with_kfold(data)
+# File containing data
+filename = 'out.csv'
+
+# Load data from csv file
+data = pd.DataFrame.from_csv(filename)
+
+# Init classifier
+clf = MultinomialNB()
+
+# Init count vectorizer
+count_vectorizer = CountVectorizer()
+
+# Randomize data indices
+data = data.reindex(np.random.permutation(data.index))
+
+# Get the label values
+y = data['class'].values
+
+# Initialize kf and skf
+k_fold = KFold(n=len(data), n_folds=10)
+skf = StratifiedKFold(y, n_folds=8)
+
+# Apply classifier evaluation
+evaluate_classifier_kf(data, skf)
