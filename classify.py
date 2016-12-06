@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.cross_validation import StratifiedKFold
-from sklearn import datasets
+from sklearn.cross_validation import KFold
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import f1_score, confusion_matrix
 
 # File containing data
 filename = 'out.csv'
@@ -14,21 +15,38 @@ data = pd.DataFrame.from_csv(filename)
 # Init classifier
 clf = MultinomialNB()
 
-# Get values, labeles and train classifier
-targets = data.index.values
-counts  = data.values
-clf.fit(counts, targets)
+# Init count vectorizer
+count_vectorizer = CountVectorizer()
 
-# Predict result on training values
-predictions = clf.predict(counts)
+# Randomize data indices
+data = data.reindex(np.random.permutation(data.index))
 
-print test_data
-#Go through all of the emails in the directory and extract their words
-for main, dirs, files in os.walk(email_dir):
-    for file in files:
-    	filename = os.path.join(email_dir, file);
-        if file.endswith(".txt"):
-        	test_email_frequency = defaultdict( int )
-        	extract_words(filename, "test")
-        	test = pd.Series(test_email_frequency).filter(test_data)
-        	print test_data
+#Classify using KFold
+def evaluate_with_kfold(data):
+	k_fold = KFold(n=len(data), n_folds=10)
+	scores = []
+	confusion = np.array([[0, 0], [0, 0]])	
+	for train_indices, test_indices in k_fold:
+	    train_text = data.iloc[train_indices]['text'].values
+	    train_y = data.iloc[train_indices]['class'].values
+
+	    test_text = data.iloc[test_indices]['text'].values
+	    test_y = data.iloc[test_indices]['class'].values
+
+	    features_counts = count_vectorizer.fit_transform(train_text)
+	    clf.fit(features_counts, train_y)
+
+	    test_counts = count_vectorizer.transform(test_text)
+	    predictions = clf.predict(test_counts)
+
+	    confusion += confusion_matrix(test_y, predictions)
+	    score = f1_score(test_y, predictions, pos_label='ham')
+	    scores.append(score)
+	print('Total emails classified:', len(data))
+	print('Score:', sum(scores)/len(scores))
+	print('Confusion matrix:')
+	print(confusion)
+	
+
+# Classify and test with KFold
+evaluate_with_kfold(data)
