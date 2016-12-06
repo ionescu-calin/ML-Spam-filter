@@ -1,58 +1,37 @@
+from filter import * 
+import pandas as pd
 import pandas as pd
 import numpy as np
+import sys
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.cross_validation import KFold
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import f1_score, confusion_matrix
 from sklearn.model_selection import cross_val_score
+from sklearn.externals import joblib
 
 
-def evaluate_classifier_kf(data, kfold):
-	scores = []
-	confusion = np.array([[0, 0], [0, 0]])	
-	for train_indices, test_indices in k_fold:
-	    train_text = data.iloc[train_indices]['text'].values
-	    train_y = data.iloc[train_indices]['class'].values
+root = os.path.dirname(os.path.realpath('__file__'))
+email_dir = 'test/'
+# Set path to test emails
+email_dir = os.path.join(root, email_dir)
+filename = sys.argv[1]
+filename = os.path.join(email_dir, filename)
 
-	    test_text = data.iloc[test_indices]['text'].values
-	    test_y = data.iloc[test_indices]['class'].values
 
-	    features_counts = count_vectorizer.fit_transform(train_text)
-	    clf.fit(features_counts, train_y)
+vocab = np.load('vocab.npy')
 
-	    test_counts = count_vectorizer.transform(test_text)
-	    predictions = clf.predict(test_counts)
+#Load classifier from disk
+clf = joblib.load('NB_Trained.pkl')
 
-	    confusion += confusion_matrix(test_y, predictions)
-	    score = f1_score(test_y, predictions, pos_label='ham')
-	    scores.append(score)
-	print('Total emails classified:', len(data))
-	print('Score:', sum(scores)/len(scores))
-	print('Confusion matrix:')
-	print(confusion)
+text = extract_words(filename, 'nan')
 
-# File containing data
-filename = 'out.csv'
-
-# Load data from csv file
-data = pd.DataFrame.from_csv(filename)
-
-# Init classifier
-clf = MultinomialNB()
-
-# Init count vectorizer
 count_vectorizer = CountVectorizer()
+features_counts = count_vectorizer.fit_transform(vocab)
 
-# Randomize data indices
-data = data.reindex(np.random.permutation(data.index))
+test_counts = count_vectorizer.transform(text)
+print count_vectorizer
+predictions = clf.predict(test_counts)
 
-# Get the label values
-y = data['class'].values
-
-# Initialize kf and skf
-k_fold = KFold(n=len(data), n_folds=10)
-skf = StratifiedKFold(y, n_folds=8)
-
-# Apply classifier evaluation
-evaluate_classifier_kf(data, skf)
+#print predictions
