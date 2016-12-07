@@ -7,8 +7,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import f1_score, confusion_matrix
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
-
-def evaluate_classifier_kf(data, kfold):
+from sklearn.dummy import DummyClassifier
+def evaluate_classifier_kf(data, kfold, clf):
 	scores = []
 	confusion = np.array([[0, 0], [0, 0]])	
 	for train_indices, test_indices in k_fold:
@@ -48,9 +48,6 @@ filename = 'out.csv'
 # Load data from csv file
 data = pd.DataFrame.from_csv(filename)
 
-# Init classifier
-clf = MultinomialNB()
-
 # Init count vectorizer
 count_vectorizer = CountVectorizer()
 
@@ -64,9 +61,16 @@ y = data['class'].values
 k_fold = KFold(n=len(data), n_folds=10)
 skf = StratifiedKFold(y, n_folds=10)
 
-# Apply classifier evaluation
-evaluate_classifier_kf(data, skf)
+# Init classifier Multinomial classifier
+clf = MultinomialNB()
 
+# Apply classifier evaluation
+evaluate_classifier_kf(data, skf, clf)
+
+# Init Baseline classifier (Random or based on the most likely class distribution)
+# strategy="most_frequent" if the class distribution is not balanced
+clf = DummyClassifier(strategy="uniform")
+evaluate_classifier_kf(data, skf, clf)
 # Save classifier to disk 
 trained_classifier = train_classifier(data, clf);
 

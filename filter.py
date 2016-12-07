@@ -27,10 +27,12 @@ vocabulary_to_load = joblib.load(dictionary_filepath)
 # count_vectorizer = CountVectorizer()
 # features_counts = count_vectorizer.fit_transform(data['text'].values)
 # print loaded_vectorizer.size
-test_counts = vocabulary_to_load.transform(test_data['text'].values)
+if text:
+	test_counts = vocabulary_to_load.transform(test_data['text'].values)
+	# print test_counts.size
 
-# print test_counts.size
-
-# Classify new email
-predictions = clf.predict(test_counts)
-print predictions[0]
+	# Classify new email
+	predictions = clf.predict(test_counts)
+	print predictions[0]
+else:
+	print "ham"
