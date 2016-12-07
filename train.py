@@ -38,7 +38,8 @@ def train_classifier(data, clf_trained):
 	features_counts = count_vectorizer.fit_transform(train_text)
 	clf_trained.fit(features_counts, data['class'].values)
 
-	np.save('vocab.npy', train_text)
+	# dataframe.to_csv('vocab.csv', sep=',')
+	np.save('trainedvocab.npy', features_counts)
 	return clf_trained
 
 # File containing data
@@ -61,11 +62,13 @@ y = data['class'].values
 
 # Initialize kf and skf
 k_fold = KFold(n=len(data), n_folds=10)
-skf = StratifiedKFold(y, n_folds=8)
+skf = StratifiedKFold(y, n_folds=10)
 
 # Apply classifier evaluation
 evaluate_classifier_kf(data, skf)
 
-#Save classifier to disk 
+# Save classifier to disk 
 trained_classifier = train_classifier(data, clf);
+
+# Save classifier to disk
 joblib.dump(trained_classifier, 'NB_Trained.pkl', compress=9)
