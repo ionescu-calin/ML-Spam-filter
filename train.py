@@ -38,8 +38,8 @@ def train_classifier(data, clf_trained):
 	features_counts = count_vectorizer.fit_transform(train_text)
 	clf_trained.fit(features_counts, data['class'].values)
 
-	# dataframe.to_csv('vocab.csv', sep=',')
-	np.save('trainedvocab.npy', features_counts)
+	dictionay_filepath = "trained_vocab.pkl"
+	joblib.dump(count_vectorizer, dictionay_filepath)
 	return clf_trained
 
 # File containing data
