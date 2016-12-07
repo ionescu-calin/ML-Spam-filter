@@ -4,7 +4,7 @@ import email
 import pandas as pd
 import numpy as np 
 
-#TODO: delete email type from extract words and decode email
+#TODO: delete email type_from extract words and decode email
 
 #Uses the global dictionaries, is there a better way?
 #Adds the words to the dictionary based on the email's type
@@ -39,14 +39,14 @@ def extract_words(filename, email_type):
 	return all_text
 
 # Build data frame from directory of emails
-def build_dataframe(email_dir):
+def build_dataframe_dir(email_dir):
 	files = []
 	rows  = [] 
 	for main, dirs, files_aux in os.walk(email_dir):
 	    for file in files_aux:
 	    	filename = os.path.join(email_dir, file);
 	        if file.endswith(".txt"):
-	        	text=[]
+	        	text = []
 	        	if "spam" not in file:
         			text = extract_words(filename, "ham")
         			if text:
@@ -60,6 +60,22 @@ def build_dataframe(email_dir):
 	dataframe = pd.DataFrame(rows, index=files)
 	return dataframe
 
+# Build data frame from an email
+def build_dataframe_email(filename, extracted_words):
+	rows = []
+	files = []
+	text = extracted_words
+	if 'spam' not in filename:
+		if text:
+			rows.append({'text': text, 'class': 'ham'})
+	else:
+		if text:
+			rows.append({'text': text, 'class' : 'spam'})
+	if text:
+		files.append(filename)
+	dataframe = pd.DataFrame(rows, index=files)
+	return dataframe
+
 # Get current path to directory
 root = os.path.dirname(os.path.realpath('__file__'))
 email_dir = 'public/'
@@ -67,5 +83,5 @@ email_dir = 'public/'
 email_dir = os.path.join(root, email_dir)
 
 # Build the dataframe and write it to a file	
-dataframe = build_dataframe(email_dir)
+dataframe = build_dataframe_dir(email_dir)
 dataframe.to_csv('out.csv', sep=',')
