@@ -4,6 +4,8 @@ import email
 import pandas as pd
 import numpy as np 
 
+#TODO: delete email type from extract words and decode email
+
 #Uses the global dictionaries, is there a better way?
 #Adds the words to the dictionary based on the email's type
 def populate_dictionary(text, all_text):
