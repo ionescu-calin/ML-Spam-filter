@@ -4,13 +4,15 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.cross_validation import KFold
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import f1_score, confusion_matrix
+from sklearn.metrics import f1_score, confusion_matrix, accuracy_score
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 from sklearn.dummy import DummyClassifier
+
 def evaluate_classifier_kf(data, kfold, clf):
 	scores = []
-	confusion = np.array([[0, 0], [0, 0]])	
+	confusion = np.array([[0, 0], [0, 0]])
+	acc_per_fold = []
 	for train_indices, test_indices in k_fold:
 	    train_text = data.iloc[train_indices]['text'].values
 	    train_y = data.iloc[train_indices]['class'].values
@@ -27,8 +29,11 @@ def evaluate_classifier_kf(data, kfold, clf):
 	    confusion += confusion_matrix(test_y, predictions)
 	    score = f1_score(test_y, predictions, pos_label='ham')
 	    scores.append(score)
+	    acc_per_fold.append( accuracy_score(test_y, predictions) )
 	print('Total emails classified:', len(data))
 	print('Score:', sum(scores)/len(scores))
+	print ("Accuracy per fold:", acc_per_fold)
+	print ("Average accuracy:", np.mean(acc_per_fold))
 	print('Confusion matrix:')
 	print(confusion)
 
@@ -71,7 +76,8 @@ evaluate_classifier_kf(data, skf, clf)
 # strategy="most_frequent" if the class distribution is not balanced
 clf = DummyClassifier(strategy="uniform")
 evaluate_classifier_kf(data, skf, clf)
-# Save classifier to disk 
+
+# Save classifier to disk
 trained_classifier = train_classifier(data, clf);
 
 # Save classifier to disk
