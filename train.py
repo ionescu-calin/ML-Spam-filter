@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.cross_validation import KFold
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import f1_score, confusion_matrix, accuracy_score, recall_score
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
@@ -22,13 +22,15 @@ def evaluate_classifier_kf(data, kfold, clf):
 	    test_y = data.iloc[test_indices]['class'].values
 
 	    features_counts = count_vectorizer.fit_transform(train_text)
-	    # features_counts_tfidf = tfidf.fit_transform(features_counts)
-	    # print features_counts
-	    clf.fit(features_counts, train_y)
+	    features_counts_tfidf = tfidf.fit_transform(features_counts)
+	    clf.fit(features_counts_tfidf, train_y)
+	    # clf.fit(features_counts, train_y)
 
 	    test_counts = count_vectorizer.transform(test_text)
-	    # test_counts_tfidf = tfidf.transform(test_counts)
-	    predictions = clf.predict(test_counts)
+	    test_counts_tfidf = tfidf.fit_transform(test_counts)
+	    predictions = clf.predict(test_counts_tfidf)
+	    # predictions = clf.predict(test_counts)
+
 
 	    confusion += confusion_matrix(test_y, predictions)
 	    score = f1_score(test_y, predictions, pos_label='ham')
@@ -47,8 +49,9 @@ def evaluate_classifier_kf(data, kfold, clf):
 def train_classifier(data, clf_trained):
 	train_text = data['text'].values
 	features_counts = count_vectorizer.fit_transform(train_text)
-	# features_counts_tfidf = tfidf.fit_transform(features_counts)
-	# clf_trained.fit(features_counts_tfidf, data['class'].values)
+	features_counts_tfidf = tfidf.fit_transform(features_counts)
+	clf_trained.fit(features_counts_tfidf, data['class'].values)
+	# clf_trained.fit(features_counts, data['class'].values)
 
 	dictionay_filepath = "trained_vocab.pkl"
 	joblib.dump(count_vectorizer, dictionay_filepath)
@@ -61,20 +64,21 @@ filename = 'out.csv'
 data = pd.DataFrame.from_csv(filename)
 
 # Init count vectorizer with params
-count_vectorizer = TfidfVectorizer(
+count_vectorizer = CountVectorizer(
 	analyzer='word',
 	lowercase=False, 
 	#preprocessor=None,
 	#tokenizer=None,
 	ngram_range=(1, 3),
-	min_df=1
+	max_df=0.7,
+	min_df=0.005
 	)
 	#df=[0.7, 1.0], 
 	# token_pattern=r'\b\w+\b', 
 	#min_df=1)
 
 # Init tfidf transformer
-#tfidf = TfidfTransformer(smooth_idf=True)
+tfidf = TfidfTransformer(smooth_idf=True)
 
 # Randomize data indices
 data = data.reindex(np.random.permutation(data.index))
@@ -88,10 +92,10 @@ skf = StratifiedKFold(y, n_folds=10)
 
 # Init Baseline classifier (Random or based on the most likely class distribution)
 # strategy="most_frequent" if the class distribution is not balanced
-# clf = DummyClassifier(strategy="uniform")
+clf = DummyClassifier(strategy="uniform")
 
 # Evaluate dummy 
-# evaluate_classifier_kf(data, skf, clf)
+evaluate_classifier_kf(data, skf, clf)
 
 # Init classifier Multinomial classifier
 clf = MultinomialNB()
