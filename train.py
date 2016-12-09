@@ -60,7 +60,7 @@ data = pd.DataFrame.from_csv(filename)
 # count_vectorizer = CountVectorizer()
 
 # Init count vectorizer with ngrams
-count_vectorizer = CountVectorizer(ngram_range=(1, 2), token_pattern=r'\b\w+\b', min_df=1)
+count_vectorizer = CountVectorizer(ngram_range=(1, 2), token_pattern=r'\b\w+\b', min_df=1, lowercase=False)
 
 # Randomize data indices
 data = data.reindex(np.random.permutation(data.index))
