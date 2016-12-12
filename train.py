@@ -60,8 +60,9 @@ data = pd.DataFrame.from_csv(filename)
 # count_vectorizer = CountVectorizer()
 
 # Init count vectorizer with ngrams
-count_vectorizer = CountVectorizer(ngram_range=(1, 2), token_pattern=r'\b\w+\b', min_df=1)
+count_vectorizer = CountVectorizer(ngram_range=(1, 2), max_df=0.1) #min_df=1, stop_words='english',)
 
+# token_pattern=r'\b\w+\b'
 # Randomize data indices
 data = data.reindex(np.random.permutation(data.index))
 
@@ -72,15 +73,15 @@ y = data['class'].values
 k_fold = KFold(n=len(data), n_folds=10)
 skf = StratifiedKFold(y, n_folds=10)
 
+# Init Baseline classifier (Random or based on the most likely class distribution)
+# strategy="most_frequent" if the class distribution is not balanced
+clf = DummyClassifier(strategy="uniform")
+evaluate_classifier_kf(data, skf, clf)
+
 # Init classifier Multinomial classifier
 clf = MultinomialNB()
 
 # Apply classifier evaluation
-evaluate_classifier_kf(data, skf, clf)
-
-# Init Baseline classifier (Random or based on the most likely class distribution)
-# strategy="most_frequent" if the class distribution is not balanced
-clf = DummyClassifier(strategy="uniform")
 evaluate_classifier_kf(data, skf, clf)
 
 # Save classifier to disk
