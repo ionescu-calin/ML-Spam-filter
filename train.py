@@ -3,11 +3,16 @@ import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.cross_validation import KFold
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import f1_score, confusion_matrix, accuracy_score, recall_score
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 from sklearn.dummy import DummyClassifier
+from sklearn.metrics import brier_score_loss
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import chi2, SelectKBest
+import matplotlib.pyplot as plt
 
 def evaluate_classifier_kf(data, kfold, clf):
 	scores = []
@@ -22,9 +27,18 @@ def evaluate_classifier_kf(data, kfold, clf):
 	    test_y = data.iloc[test_indices]['class'].values
 
 	    features_counts = count_vectorizer.fit_transform(train_text)
-	    clf.fit(features_counts, train_y)
+	    # clf.fit(features_counts, train_y)
+	    features_counts_tfidf = tfidf.fit_transform(features_counts)
+	    # print features_counts_tfidf
+	    clf.fit(features_counts, train_y) #sample_weight=features_counts_tfidf)
+
+	    # print features_counts.shape
+	    # clf.fit(SelectKBest(chi2, k=93389).fit_transform(features_counts, train_y), train_y)
+
 
 	    test_counts = count_vectorizer.transform(test_text)
+	    test_counts_tfidf = tfidf.fit_transform(test_counts)
+
 	    predictions = clf.predict(test_counts)
 
 	    confusion += confusion_matrix(test_y, predictions)
@@ -46,7 +60,8 @@ def train_classifier(data, clf_trained):
 	features_counts = count_vectorizer.fit_transform(train_text)
 	clf_trained.fit(features_counts, data['class'].values)
 
-	dictionay_filepath = "trained_vocab.pkl"
+	# print features_counts[:,:]
+ 	dictionay_filepath = "trained_vocab.pkl"
 	joblib.dump(count_vectorizer, dictionay_filepath)
 	return clf_trained
 
@@ -59,8 +74,10 @@ data = pd.DataFrame.from_csv(filename)
 # Init count vectorizer
 # count_vectorizer = CountVectorizer()
 
-# Init count vectorizer with ngrams
-count_vectorizer = CountVectorizer(ngram_range=(1, 2), max_df=0.1) #min_df=1, stop_words='english',)
+# Init count vectorizer with ngrams	
+count_vectorizer = CountVectorizer(ngram_range=(1, 2), lowercase=False) #max_df=0.3)# min_df=0.01) #stop_words='english',)
+
+tfidf = TfidfTransformer(norm='l2', smooth_idf=True, use_idf=False)
 
 # token_pattern=r'\b\w+\b'
 # Randomize data indices
@@ -89,3 +106,52 @@ trained_classifier = train_classifier(data, clf);
 
 # Save classifier to disk
 joblib.dump(trained_classifier, 'NB_Trained.pkl', compress=9)
+
+sample_weight = np.random.RandomState(42).rand(data['class'].values.shape[0])
+
+train_text = data['text'].values
+features_counts = count_vectorizer.fit_transform(train_text)
+
+# split train, test for calibration
+X_train, X_test, y_train, y_test, sw_train, sw_test = \
+train_test_split(features_counts, data['class'].values, sample_weight, test_size=0.5, random_state=42)
+
+trained_classifier.fit(X_train, y_train)  
+prob_pos_clf = trained_classifier.predict_proba(X_test)[:, 1]
+
+clf_isotonic = CalibratedClassifierCV(trained_classifier, cv=2, method='isotonic')
+clf_isotonic.fit(X_train, y_train, sw_train)
+prob_pos_isotonic = clf_isotonic.predict_proba(X_test)[:, 1]
+
+# Gaussian Naive-Bayes with sigmoid calibration
+clf_sigmoid = CalibratedClassifierCV(trained_classifier, cv=2, method='sigmoid')
+clf_sigmoid.fit(X_train, y_train, sw_train)
+prob_pos_sigmoid = clf_sigmoid.predict_proba(X_test)[:, 1]
+
+print("Brier scores: (the smaller the better)")
+
+clf_score = brier_score_loss(y_test, prob_pos_clf, sw_test)
+print("No calibration: %1.3f" % clf_score)
+
+clf_isotonic_score = brier_score_loss(y_test, prob_pos_isotonic, sw_test)
+print("With isotonic calibration: %1.3f" % clf_isotonic_score)
+
+clf_sigmoid_score = brier_score_loss(y_test, prob_pos_sigmoid, sw_test)
+print("With sigmoid calibration: %1.3f" % clf_sigmoid_score)
+
+
+plt.figure()
+order = np.lexsort((prob_pos_clf, ))
+plt.plot(prob_pos_clf[order], 'r', label='No calibration (%1.3f)' % clf_score)
+plt.plot(prob_pos_isotonic[order], 'g', linewidth=3,
+         label='Isotonic calibration (%1.3f)' % clf_isotonic_score)
+plt.plot(prob_pos_sigmoid[order], 'b', linewidth=3,
+         label='Sigmoid calibration (%1.3f)' % clf_sigmoid_score)
+
+plt.ylim([-0.05, 1.05])
+plt.xlabel("Instances sorted according to predicted probability "
+           "(uncalibrated MNB)")
+plt.ylabel("P(y=1)")
+plt.legend(loc="upper left")
+plt.title("Naive Bayes probabilities")
+plt.show()

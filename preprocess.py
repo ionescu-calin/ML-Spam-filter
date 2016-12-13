@@ -16,23 +16,30 @@ stemmer = PorterStemmer()
 def populate_dictionary(text, all_text):
 	for word in text:
 		if re.match("^[A-Za-z]*$", word):
-			if(word not in stop): 
+			# if(word not in stop): 
 				#word = lmtzr.lemmatize(word)
-				word = stemmer.stem(word)
-				all_text = all_text + " " + word
+			word = stemmer.stem(word)
+			all_text = all_text + " " + word
    	return all_text
 
-#Recursively goes through the email to count the words
 def decode_email(parsed_email, all_text):
 	if parsed_email.is_multipart():
-	    for part in parsed_email.get_payload():
-	    	if part.is_multipart():
+		subject = parsed_email.get('Subject')	
+		if subject:	
+			print subject
+		else:
+			subject = ""
+		for part in parsed_email.get_payload():
+			if part.is_multipart():
 	    		 for part2 in parsed_email.get_payload():
-	    		 	return decode_email(part2, all_text)
+	    		 	return decode_email(part2, populate_dictionary(subject.split(), all_text))
 	    	else:
-		        return decode_email(part, all_text)
+		        return decode_email(part, populate_dictionary(subject.split(), all_text))
 	else:
-		return populate_dictionary(parsed_email.get_payload().split(), all_text)
+		if parsed_email.get('Subject'):
+			return populate_dictionary(parsed_email.get_payload().split() + parsed_email.get('Subject').split(), all_text)
+		else:
+			return populate_dictionary(parsed_email.get_payload().split(), all_text)
 
 # Extract words from file email
 def extract_words(filename):
