@@ -4,7 +4,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.cross_validation import KFold
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.metrics import f1_score, confusion_matrix, accuracy_score, recall_score
+from sklearn.metrics import f1_score, confusion_matrix, accuracy_score, recall_score, classification_report
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 from sklearn.dummy import DummyClassifier
@@ -41,16 +41,18 @@ def evaluate_classifier_kf(data, kfold, clf):
 
 	    predictions = clf.predict(test_counts)
 
+	    target_names = ['ham', 'spam']
 	    confusion += confusion_matrix(test_y, predictions)
-	    score = f1_score(test_y, predictions, pos_label='ham')
-	    scores.append(score)
-	    acc_per_fold.append( accuracy_score(test_y, predictions) )
-	    recall_per_fold.append(recall_score(test_y, predictions, average=None))
+	    # score = f1_score(test_y, predictions, pos_label='ham')
+	    # scores.append(score)
+	    # acc_per_fold.append( accuracy_score(test_y, predictions) )
+	    # recall_per_fold.append(recall_score(test_y, predictions, average=None))
+	    print(classification_report(test_y, predictions, target_names=target_names))
 	print('Total emails classified:', len(data))
-	print('Score:', sum(scores)/len(scores))
-	print ("Accuracy per fold:", acc_per_fold)
-	print ("Average accuracy:", np.mean(acc_per_fold))
-	print("Average recall:", np.mean(recall_per_fold))
+	# print('Score:', sum(scores)/len(scores))
+	# print ("Accuracy per fold:", acc_per_fold)
+	# print ("Average accuracy:", np.mean(acc_per_fold))
+	# print("Average recall:", np.mean(recall_per_fold))
 	print('Confusion matrix:')
 	print(confusion)
 
@@ -75,7 +77,7 @@ data = pd.DataFrame.from_csv(filename)
 # count_vectorizer = CountVectorizer()
 
 # Init count vectorizer with ngrams	
-count_vectorizer = CountVectorizer(ngram_range=(1, 2), lowercase=False) #max_df=0.3)# min_df=0.01) #stop_words='english',)
+count_vectorizer = CountVectorizer(ngram_range=(1,2), lowercase=False) #lowercase=False) #max_df=0.3)# min_df=0.01) #stop_words='english',)
 
 tfidf = TfidfTransformer(norm='l2', smooth_idf=True, use_idf=False)
 
@@ -93,10 +95,10 @@ skf = StratifiedKFold(y, n_folds=10)
 # Init Baseline classifier (Random or based on the most likely class distribution)
 # strategy="most_frequent" if the class distribution is not balanced
 clf = DummyClassifier(strategy="uniform")
-evaluate_classifier_kf(data, skf, clf)
+# evaluate_classifier_kf(data, skf, clf)
 
 # Init classifier Multinomial classifier
-clf = MultinomialNB()
+clf = MultinomialNB(alpha=0.05)
 
 # Apply classifier evaluation
 evaluate_classifier_kf(data, skf, clf)
@@ -114,7 +116,7 @@ features_counts = count_vectorizer.fit_transform(train_text)
 
 # split train, test for calibration
 X_train, X_test, y_train, y_test, sw_train, sw_test = \
-train_test_split(features_counts, data['class'].values, sample_weight, test_size=0.5, random_state=42)
+train_test_split(features_counts, data['class'].values, sample_weight, test_size=0.1, random_state=42)
 
 trained_classifier.fit(X_train, y_train)  
 prob_pos_clf = trained_classifier.predict_proba(X_test)[:, 1]

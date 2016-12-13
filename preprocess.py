@@ -18,7 +18,7 @@ def populate_dictionary(text, all_text):
 		if re.match("^[A-Za-z]*$", word):
 			# if(word not in stop): 
 				#word = lmtzr.lemmatize(word)
-			word = stemmer.stem(word)
+			# word = stemmer.stem(word)
 			all_text = all_text + " " + word
    	return all_text
 
