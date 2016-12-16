@@ -1,0 +1,332 @@
+Simple classifier
+	-extract all the words from emails
+	-removed words bigger with length <= 2
+	-without laplace
+('Total emails classified:', 500)
+('Score:', 0.58774553444201783)
+('Average accuracy:', 0.48000000000000009)
+('Average recall:', 0.49984428885905141)
+('Average precision:', 0.49752028632687278)
+Confusion matrix:
+[[188 212]
+ [ 48  52]]
+('Total emails classified:', 500)
+('Score:', 0.97881685011736752)
+('Average accuracy:', 0.96599999999999997)
+('Average recall:', 0.94944499999378063)
+('Average precision:', 0.94324640692018757)
+Confusion matrix:
+[[391   9]
+ [  8  92]]
+
+
+Laplace
+	1
+	('Total emails classified:', 500)
+	('Score:', 0.98085069778159206)
+	('Average accuracy:', 0.96999999999999997)
+	('Average recall:', 0.9611059141546946)
+	('Average precision:', 0.95280345171872793)
+	Confusion matrix:
+	[[391   9]
+	 [  6  94]]
+
+
+	0.5
+	('Total emails classified:', 500)
+	('Score:', 0.9788907631134125)
+	('Average accuracy:', 0.96599999999999997)
+	('Average recall:', 0.94273268453146497)
+	('Average precision:', 0.94610881513115286)
+	Confusion matrix:
+	[[392   8]
+	 [  9  91]]
+
+	0.1
+	('Total emails classified:', 500)
+	('Score:', 0.9786230738399313)
+	('Average accuracy:', 0.96599999999999997)
+	('Average recall:', 0.94987063001597871)
+	('Average precision:', 0.94406274257663936)
+	Confusion matrix:
+	[[391   9]
+	 [  8  92]]
+
+
+	0.05
+	('Total emails classified:', 500)
+	('Score:', 0.9788907631134125)
+	('Average accuracy:', 0.96599999999999997)
+	('Average recall:', 0.94273268453146497)
+	('Average precision:', 0.94610881513115286)
+	Confusion matrix:
+	[[392   8]
+	 [  9  91]]
+
+Fit-prior = false
+	('Total emails classified:', 500)
+	('Score:', 0.97797525539302621)
+	('Average accuracy:', 0.96599999999999997)
+	('Average recall:', 0.95991422693359563)
+	('Average precision:', 0.93703688902639559)
+	Confusion matrix:
+	[[389  11]
+	 [  6  94]]
+
+
+=> after part1 calibration: laplace = 0.5, fit-prior=true
+Stopwords:
+	('Total emails classified:', 500)
+	('Score:', 0.97987467466551215)
+	('Average accuracy:', 0.96799999999999997)
+	('Average recall:', 0.95860910241321162)
+	('Average precision:', 0.94584342486781503)
+	Confusion matrix:
+	[[390  10]
+	 [  6  94]]
+
+Stemmer
+	('Total emails classified:', 500)
+	('Score:', 0.98124360968627999)
+	('Average accuracy:', 0.96999999999999997)
+	('Average recall:', 0.96365532243939689)
+	('Average precision:', 0.94567301421677319)
+	Confusion matrix:
+	[[390  10]
+	 [  5  95]]
+
+Lemmatizer
+	('Total emails classified:', 500)
+	('Score:', 0.98219755318556334)
+	('Average accuracy:', 0.97199999999999986)
+	('Average recall:', 0.96012576071786593)
+	('Average precision:', 0.95289775283196343)
+	Confusion matrix:
+	[[393   7]
+	 [  7  93]]
+
+Ngrams
+
+	1-2
+		('Total emails classified:', 500)
+		('Score:', 0.98140646897279338)
+		('Average accuracy:', 0.96999999999999997)
+		('Average recall:', 0.9364848295336099)
+		('Average precision:', 0.97527608523070808)
+		Confusion matrix:
+		[[398   2]
+		 [ 13  87]]
+
+	1-3
+		('Total emails classified:', 500)
+		('Score:', 0.97779807994153367)
+		('Average accuracy:', 0.96399999999999986)
+		('Average recall:', 0.91530826558265588)
+		('Average precision:', 0.96790657751393039)
+		Confusion matrix:
+		[[398   2]
+		 [ 16  84]]
+
+	2-2
+		('Total emails classified:', 500)
+		('Score:', 0.96112395990885557)
+		('Average accuracy:', 0.93800000000000006)
+		('Average recall:', 0.91684941391847974)
+		('Average precision:', 0.89967993865689944)
+		Confusion matrix:
+		[[382  18]
+		 [ 13  87]]
+
+Chosen 1-2
+
+max_features
+	100
+		('Total emails classified:', 500)
+		('Score:', 0.93777173784290857)
+		('Average accuracy:', 0.90000000000000002)
+		('Average recall:', 0.83193465605853267)
+		('Average precision:', 0.85323445631947126)
+		Confusion matrix:
+		[[379  21]
+		 [ 29  71]]
+
+	500
+		('Total emails classified:', 500)
+		('Score:', 0.96656903426562601)
+		('Average accuracy:', 0.94600000000000006)
+		('Average recall:', 0.92526567849809482)
+		('Average precision:', 0.89918779248849834)
+		Confusion matrix:
+		[[382  18]
+	 	 [  9  91]]
+
+	1000
+		('Total emails classified:', 500)
+		('Score:', 0.96977488091736641)
+		('Average accuracy:', 0.95399999999999996)
+		('Average recall:', 0.94676034500729622)
+		('Average precision:', 0.91668381405379262)
+		Confusion matrix:
+		[[385  15]
+		 [  8  92]]
+
+    2000
+    	('Total emails classified:', 500)
+		('Score:', 0.97129437306573452)
+		('Average accuracy:', 0.95400000000000007)
+		('Average recall:', 0.93068092247970302)
+		('Average precision:', 0.93058494185076412)
+		Confusion matrix:
+		[[387  13]
+		 [ 10  90]]
+
+    5000
+    	('Total emails classified:', 500)
+		('Score:', 0.97896420255261529)
+		('Average accuracy:', 0.96799999999999997)
+		('Average recall:', 0.95959898414969003)
+		('Average precision:', 0.95086882541953144)
+		Confusion matrix:
+		[[391   9]
+		 [  7  93]]
+
+	10000
+		('Total emails classified:', 500)
+		('Score:', 0.98118005673563502)
+		('Average accuracy:', 0.96999999999999997)
+		('Average recall:', 0.9575297448369664)
+		('Average precision:', 0.95121169480925583)
+		Confusion matrix:
+		[[392   8]
+		 [  7  93]]
+
+	50000
+		('Total emails classified:', 500)
+		('Score:', 0.98309494625427685)
+		('Average accuracy:', 0.97199999999999986)
+		('Average recall:', 0.91775217330095382)
+		('Average precision:', 0.9758589108022907)
+		Confusion matrix:
+		[[398   2]
+		 [ 12  88]]
+
+
+	100000	 
+		('Total emails classified:', 500)
+		('Score:', 0.98314481794599939)
+		('Average accuracy:', 0.97399999999999998)
+		('Average recall:', 0.95056310469778915)
+		('Average precision:', 0.97242287000448191)
+		Confusion matrix:
+		[[397   3]
+		 [ 10  90]]
+
+	200000
+		('Total emails classified:', 500)
+		('Score:', 0.98154249277454164)
+		('Average accuracy:', 0.96999999999999997)
+		('Average recall:', 0.93714480932504196)
+		('Average precision:', 0.9673727852471472)
+		Confusion matrix:
+		[[397   3]
+		 [ 12  88]]
+
+	500000
+		('Total emails classified:', 500)
+		('Score:', 0.97710194013887597)
+		('Average accuracy:', 0.96400000000000008)
+		('Average recall:', 0.92476712558234309)
+		('Average precision:', 0.96162541348587849)
+		Confusion matrix:
+		[[396   4]
+		 [ 14  86]]
+
+tf-idf
+	
+	100000 features
+
+		('Total emails classified:', 500)
+		('Score:', 0.8959790367909477)
+		('Average accuracy:', 0.81600000000000006)
+		('Average recall:', 0.5404304029304029)
+		('Average precision:', 0.70653571428571438)
+		Confusion matrix:
+		[[400   0]
+		 [ 92   8]]
+
+	10000 features
+
+		('Total emails classified:', 500)
+		('Score:', 0.90194123736852794)
+		('Average accuracy:', 0.82800000000000007)
+		('Average recall:', 0.5820571789321789)
+		('Average precision:', 0.86203057527358773)
+		Confusion matrix:
+		[[400   0]
+		 [ 86  14]]
+
+	5000
+
+		('Total emails classified:', 500)
+		('Score:', 0.92016785876843277)
+		('Average accuracy:', 0.8620000000000001)
+		('Average recall:', 0.6590512265512265)
+		('Average precision:', 0.92656094314074688)
+		Confusion matrix:
+		[[400   0]
+		 [ 69  31]]
+
+	1000
+
+		('Total emails classified:', 500)
+		('Score:', 0.96081195665485475)
+		('Average accuracy:', 0.93599999999999994)
+		('Average recall:', 0.86377309451054851)
+		('Average precision:', 0.92733092020460328)
+		Confusion matrix:
+		[[393   7]
+		 [ 25  75]]
+
+	500
+
+		('Total emails classified:', 500)
+		('Score:', 0.95701347999291575)
+		('Average accuracy:', 0.93000000000000005)
+		('Average recall:', 0.85789062403150962)
+		('Average precision:', 0.91924722469816067)
+		Confusion matrix:
+		[[393   7]
+		 [ 28  72]]
+
+Without tf-idf
+
+max-df
+	0.5
+		('Total emails classified:', 500)
+		('Score:', 0.98357059104252043)
+		('Average accuracy:', 0.97399999999999998)
+		('Average recall:', 0.94096811281021808)
+		('Average precision:', 0.97835014677936216)
+		Confusion matrix:
+		[[398   2]
+		 [ 11  89]]
+
+	0.7
+		('Total emails classified:', 500)
+		('Score:', 0.97824715269856399)
+		('Average accuracy:', 0.96399999999999986)
+		('Average recall:', 0.92220589637563555)
+		('Average precision:', 0.94820571575392409)
+		Confusion matrix:
+		[[394   6]
+		 [ 12  88]]
+
+	0.8
+		('Total emails classified:', 500)
+		('Score:', 0.98105736756046868)
+		('Average accuracy:', 0.96999999999999997)
+		('Average recall:', 0.94044276375798108)
+		('Average precision:', 0.96151914978851849)
+		Confusion matrix:
+		[[397   3]
+		 [ 12  88]]

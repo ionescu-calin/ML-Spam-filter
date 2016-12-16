@@ -5,29 +5,27 @@ import pandas as pd
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
 #from nltk.stem.snowball import SnowballStemmer
-#from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.wordnet import WordNetLemmatizer
 
 stop = set(stopwords.words('english'))
 #stemmer = SnowballStemmer("english")
 stemmer = PorterStemmer()
-#lmtzr = WordNetLemmatizer()
+lmtzr = WordNetLemmatizer()
 
 #Adds the words to the dictionary based on the email's type
 def populate_dictionary(text, all_text):
 	for word in text:
 		if re.match("^[A-Za-z]*$", word):
-			# if(word not in stop): 
-				#word = lmtzr.lemmatize(word)
-			# word = stemmer.stem(word)
-			all_text = all_text + " " + word
+			if(len(word) > 2 and word not in stop): 
+				word = lmtzr.lemmatize(word)
+				# word = stemmer.stem(word)
+				all_text = all_text + " " + word
    	return all_text
 
 def decode_email(parsed_email, all_text):
 	if parsed_email.is_multipart():
 		subject = parsed_email.get('Subject')	
-		if subject:	
-			print subject
-		else:
+		if not subject:	
 			subject = ""
 		for part in parsed_email.get_payload():
 			if part.is_multipart():

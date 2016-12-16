@@ -20,12 +20,11 @@ count_vectorizer = joblib.load(dictionary_filepath)
 
 if text:
 	test_counts = count_vectorizer.transform(test_data['text'].values)
-	print test_data['text'].values
 
 	# Classify new email
 	predictions = clf.predict(test_counts)
-	prob_pos_clf = clf.predict_proba(test_counts)[:,1]
-	print prob_pos_clf
+	# prob_pos_clf = clf.predict_proba(test_counts)[:,1]
+	# print prob_pos_clf
 	print predictions[0]
 else:
 	print "ham"
